@@ -1,0 +1,24 @@
+{
+  "name": "crm-natural-person",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "tsc && node src/server.js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "description": "",
+  "devDependencies": {
+    "@types/node": "^22.14.0",
+    "typescript": "^5.8.3"
+  },
+  "dependencies": {
+    "@aws-sdk/client-dynamodb": "^3.788.0",
+    "@aws-sdk/client-sqs": "^3.787.0",
+    "axios": "^1.8.4",
+    "bottleneck": "^2.19.5",
+    "dayjs": "^1.11.13"
+  }
+}
