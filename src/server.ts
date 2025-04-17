@@ -1,18 +1,11 @@
-import { DeleteMessageCommand, DeleteMessageRequest, ReceiveMessageCommand, ReceiveMessageRequest, SQSClient } from "@aws-sdk/client-sqs"
+
 import { ErpClientResponse } from "./interfaces/queue-response"
-import axios from "axios"
-import { DynamoDBClient, GetItemCommand, GetItemCommandInput, QueryCommand } from "@aws-sdk/client-dynamodb"
-import { marshall, unmarshall } from "@aws-sdk/util-dynamodb"
-import { Owner } from "./interfaces/owner"
+
 import { QueueService } from "./services/queue"
 import { PloomesService } from "./services/ploomes"
 import { OwnerService } from "./services/owner"
 
-async function test() {
-
-  const db = new DynamoDBClient({
-    region: "us-east-2"
-  })
+export async function handler() {
 
   const queue = new QueueService()
 
@@ -55,5 +48,3 @@ async function test() {
     }
   }
 }
-
-test()
