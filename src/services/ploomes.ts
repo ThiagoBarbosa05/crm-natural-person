@@ -14,21 +14,39 @@ type CreateContactInput = {
   }[]
 }
 
+type GetContactInput = {
+  document: string | null
+  phoneNumber: string | null
+}
+
 export class PloomesService {
 
-  async getContact(document: string) {
+  async getContact({ document, phoneNumber }: GetContactInput) {
     try {
-      const  existingPloomesContactResponse = await ploomesLimiter.schedule(() => 
-        retryWithBackOff(() => 
-          axios.get<{value: CrmContact[]}>(`https://api2.ploomes.com/Contacts?$filter=(((TypeId+eq+2)))+and+TypeId+eq+2+and+Register+eq+%27${document}%27&$expand=Owner($select=Id,Name,Email)&preload=true`, {
-            headers: {
-              "User-Key": process.env.USER_KEY
-            }
-          })
+      let existingPloomesContactResponse: { data :{value: CrmContact[]} } | undefined
+
+      if(document) {
+        existingPloomesContactResponse = await ploomesLimiter.schedule(() => 
+          retryWithBackOff(() => 
+            axios.get(`https://api2.ploomes.com/Contacts?$filter=(((TypeId+eq+2)))+and+TypeId+eq+2+and+Register+eq+%27${document}%27&$expand=Owner($select=Id,Name,Email)&preload=true`, {
+              headers: {
+                "User-Key": process.env.USER_KEY
+              }
+            })
+          )
         )
-      )
-  
-      return existingPloomesContactResponse.data.value[0]
+      } else if (phoneNumber) {
+        existingPloomesContactResponse = await ploomesLimiter.schedule(() => 
+          retryWithBackOff(() => 
+            axios.get(`https://api2.ploomes.com/Contacts?$filter=Phones/any(p: p/PhoneNumber eq '${phoneNumber}')`, {
+              headers: {
+                "User-Key": process.env.USER_KEY
+              }
+            })
+          )
+        )
+      }
+      return existingPloomesContactResponse?.data.value[0] ?? null
 
     } catch (error) {
       console.error("❌ Não foi possível buscar o contato: ", error)

@@ -22,10 +22,13 @@ export async function handler() {
     const salesInfo = JSON.parse(message.Body!) as ErpClientResponse
     const owner = await ownerService.getOwner(salesInfo.client.vendedor)
     
-    if(salesInfo.client.document) {
+    if(salesInfo.client.document || salesInfo.client.phone) {
       const ploomes = new PloomesService()
       console.log(`⏳ Verificando se o cliente ${salesInfo.client.name} existe no ploomes`)
-      const existingContact = await ploomes.getContact(salesInfo.client.document)
+      const existingContact = await ploomes.getContact({
+        document: salesInfo.client.document,
+        phoneNumber: salesInfo.client.phone
+      })
         
       if(!existingContact) {
             console.info(`⏳ Criando cliente ${salesInfo.client.name} no Ploomes`)
@@ -45,6 +48,8 @@ export async function handler() {
       
       console.log(`‼️ Removendo message da QUEUE`)
       await queue.deleteMessage(message)
+    } else {
+      console.info(`‼️ Cliente ${salesInfo.client.name} não possui documento ou telefone`)
     }
   }
 }
